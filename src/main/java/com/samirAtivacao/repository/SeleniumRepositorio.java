@@ -264,7 +264,7 @@ public class SeleniumRepositorio {
 						System.out.println("mesmo ano");
 						int x = 0;
 						x = dataATUALocalDateTime.getDayOfYear() - dataValidacao.getDayOfYear();
-						if (x <= 300) {
+						if (x <= 30) {
 							System.out.println("x é menor ou igual a 30  x = " + x);
 							return true;
 						} else {
@@ -375,6 +375,7 @@ public class SeleniumRepositorio {
 					String rmi;
 					String dibInicial;
 					String dibFinal;
+					String dibAnterior;
 					String aps;
 					String nbUnido;
 					for (int j = 2; j < 100; j++) {
@@ -443,11 +444,20 @@ public class SeleniumRepositorio {
 															+ "]/table[2]/tbody/tr[2]/td[1]"))
 											.getText();
 									System.out.println("RMI: " + rmi);
+
+									dibAnterior = driver.findElement(By.xpath("/html/body/div/div[" + z + "]/div[" + j
+											+ "]/table[2]/tbody/tr[2]/td[6]")).getText();
+									if(dibAnterior.contains("-")){
+										dibAnterior = "";
+									}
+
 									aps = driver
 											.findElement(By.xpath(
 													"/html/body/div/div[" + z + "]/div[" + j
 															+ "]/table[3]/tbody/tr[2]/td[8]"))
 											.getText();
+
+
 									System.out.println("APS: " + aps);
 									z = 100;
 									j = 100;
@@ -456,6 +466,7 @@ public class SeleniumRepositorio {
 									informacao.setDibInicial(dibInicial);
 									informacao.setDibFinal(dibFinal);
 									informacao.setDip(dip);
+									informacao.setDibAnterior(dibAnterior);
 									informacao.setUrlProcesso(driver.getCurrentUrl());
 									System.out.println("Url da pagina " + driver.getCurrentUrl());
 									nbUnido = unirNbInformacoesCessado(procurarCessado());
@@ -755,7 +766,7 @@ public class SeleniumRepositorio {
 		}
 		driver.findElement(By.id("urlProcesso")).sendKeys(lista.getUrlProcesso());
 		driver.findElement(By.id("aps")).sendKeys(lista.getAps());
-
+		driver.findElement(By.id("dibAnterior")).sendKeys(lista.getDibAnterior());
 		String[] listaNb = lista.getCessado().split(",");
 
 		try {

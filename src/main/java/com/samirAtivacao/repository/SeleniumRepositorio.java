@@ -92,6 +92,42 @@ public class SeleniumRepositorio {
 
 	}
 
+	public String clicarNaPrincipal(){
+		this.driver.manage().timeouts().implicitlyWait(100, TimeUnit.SECONDS).pageLoadTimeout(100, TimeUnit.SECONDS);
+
+		try {
+			List<String> janela = new ArrayList<String>(driver.getWindowHandles());
+			driver.switchTo().window(janela.get(1));
+			wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//tr[1]/td[2]/div/span")));
+
+
+			driver.switchTo().frame(0);
+			do {
+				try {
+					wait.until(ExpectedConditions.elementToBeClickable(By.tagName("html")));
+					wait.until(ExpectedConditions.presenceOfElementLocated(By.tagName("body")));
+					driver.findElement(By.tagName("html")).click();
+					break;
+				} catch (Exception e) {
+					//
+				}
+			} while (true);
+			this.driver.manage().timeouts().implicitlyWait(100, TimeUnit.SECONDS).pageLoadTimeout(100, TimeUnit.SECONDS);
+//		WebElement capa = driver.findElement(By.id("iframe-myiframe"));
+			wait.until(ExpectedConditions.elementToBeClickable(By.xpath("/html/body/div/div[4]/table/tbody/tr[13]/td[2]/a[1]/b")));
+			WebElement clique = driver.findElement(By.xpath("/html/body/div/div[4]/table/tbody/tr[13]/td[2]/a[1]/b"));
+			clique.click();
+		}catch (Exception e){
+			System.out.println("entrei no cat clicarNaPrincipal");
+			System.out.println(e);
+		}
+
+//		wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(capa));
+
+
+		return "clicado";
+	}
+
 	public String colocarFiltro(String etiqueta) throws InterruptedException {
 		this.driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS).pageLoadTimeout(30, TimeUnit.SECONDS);
 		WebElement setaAparecer = driver.findElement(
@@ -123,35 +159,41 @@ public class SeleniumRepositorio {
 
 	}
 
-	public String entrarNoProcessoAutomatico(String etiqueta) throws InterruptedException {
-		this.driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS).pageLoadTimeout(30, TimeUnit.SECONDS);
-		Thread.sleep(1000);
-		String verificacao = driver
-				.findElement(By.xpath("/html/body/div[4]/div[1]/div[2]/div/div[2]/div/div[2]/div/div/div[7]"))
-				.getText();
+	public boolean entrarNoProcessoAutomatico(String etiqueta) throws InterruptedException {
+		try {
+			this.driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS).pageLoadTimeout(30, TimeUnit.SECONDS);
+			Thread.sleep(1000);
+			String verificacao = driver
+					.findElement(By.xpath("/html/body/div[4]/div[1]/div[2]/div/div[2]/div/div[2]/div/div/div[7]"))
+					.getText();
 
-		System.out.println(verificacao);
-		String falso = "Sem registros para exibir";
+			System.out.println(verificacao);
+			String falso = "Sem registros para exibir";
 
-		boolean confirmacaoDeExistencia = verificacao.equals(falso);
-		System.out.println(confirmacaoDeExistencia);
-		if (confirmacaoDeExistencia == true) {
-			return "Sem registros para exibir";
-		} else {
-			long time = 15000;
-			wait = new WebDriverWait(driver, time);
-			wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(
-					"/html/body/div[4]/div[1]/div[2]/div/div[2]/div/div[4]/div/table/tbody/tr[1]/td[3]/div/a[1]")));
-			wait.until(ExpectedConditions.elementToBeClickable(By.xpath(
-					"/html/body/div[4]/div[1]/div[2]/div/div[2]/div/div[4]/div/table/tbody/tr[1]/td[3]/div/a[1]")));
+			boolean confirmacaoDeExistencia = verificacao.equals(falso);
+			System.out.println(confirmacaoDeExistencia);
+			if (confirmacaoDeExistencia == true) {
+				return false;
+			} else {
+				long time = 15000;
+				wait = new WebDriverWait(driver, time);
+				wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(
+						"/html/body/div[4]/div[1]/div[2]/div/div[2]/div/div[4]/div/table/tbody/tr[1]/td[3]/div/a[1]")));
+				wait.until(ExpectedConditions.elementToBeClickable(By.xpath(
+						"/html/body/div[4]/div[1]/div[2]/div/div[2]/div/div[4]/div/table/tbody/tr[1]/td[3]/div/a[1]")));
 
-			WebElement processo = driver.findElement(By.xpath(
-					"/html/body/div[4]/div[1]/div[2]/div/div[2]/div[1]/div[4]/div/table/tbody/tr[1]/td[3]/div/a[1]"));
-			processo.click();
-			return "pronto para procurar";
+				WebElement processo = driver.findElement(By.xpath(
+						"/html/body/div[4]/div[1]/div[2]/div/div[2]/div[1]/div[4]/div/table/tbody/tr[1]/td[3]/div/a[1]"));
+				processo.click();
+				return true;
+
+			}
+		}catch (Exception e){
+			System.out.println("entrei no cat entrarNoProcessoAutomatico");
+			System.out.println(e);
+			return entrarNoProcessoAutomatico(etiqueta);
 
 		}
-
 	}
 
 	/*
@@ -201,7 +243,7 @@ public class SeleniumRepositorio {
 		this.driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS).pageLoadTimeout(30, TimeUnit.SECONDS);
 		Thread.sleep(1000);
 		List<String> janela = new ArrayList<String>(driver.getWindowHandles());
-		driver.switchTo().window(janela.get(1));
+		driver.switchTo().window(janela.get(2));
 		wait.until(ExpectedConditions.presenceOfElementLocated(By.id("treeview-1015")));
 		WebElement TabelaTref = driver.findElement(By.id("treeview-1015"));
 		List<WebElement> listaMovimentacao = new ArrayList<WebElement>(TabelaTref.findElements(By.cssSelector("tr")));
@@ -264,31 +306,26 @@ public class SeleniumRepositorio {
 						System.out.println("mesmo ano");
 						int x = 0;
 						x = dataATUALocalDateTime.getDayOfYear() - dataValidacao.getDayOfYear();
-						if (x <= 300) {
+						if (x <= 30) {
 							System.out.println("x é menor ou igual a 30  x = " + x);
 							return true;
 						} else {
 
-							System.out.println("x maior que 30 dias");
+							System.out.println("x maior que 30 dias x= " + x);
 							return false;
 
 						}
 					} else {
-						if (dataATUALocalDateTime.getYear() == dataValidacao.getYear() + 1) {
-							if (dataValidacao.getMonthValue() == 12) {
-
+						if (dataATUALocalDateTime.getYear() == dataValidacao.getYear() + 1 && dataValidacao.getMonthValue() == 12 && dataATUALocalDateTime.getMonthValue() == 1) {
 								int x = dataValidacao.getDayOfYear() - 333;
 								// dataATUALocalDateTime.getDayOfYear()<= x
-								if (dataATUALocalDateTime.getDayOfYear() <= x) {
+								if ( x > dataATUALocalDateTime.getDayOfYear()) {
 									System.out.println("x é menor ou igual a 30 , x " + x);
 									return true;
 								} else {
-
-									System.out.println("x maior que 30 dias");
+									System.out.println("x maior que 30 dias. x: " + x );
 									return false;
-
 								}
-							}
 						} else {
 							System.out.println("ano diferente");
 							return false;
@@ -314,31 +351,10 @@ public class SeleniumRepositorio {
 		InfomacoesDosPrev informacao = new InfomacoesDosPrev();
 		this.driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS).pageLoadTimeout(30, TimeUnit.SECONDS);
 		List<String> janela = new ArrayList<String>(driver.getWindowHandles());
-		driver.switchTo().window(janela.get(1));
+		driver.switchTo().window(janela.get(2));
 		WebElement TabelaTref = driver.findElement(By.id("treeview-1015"));
 		List<WebElement> listaMovimentacao = new ArrayList<WebElement>(TabelaTref.findElements(By.cssSelector("tr")));
-		try {
-			for (int h = 2; h < listaMovimentacao.size(); h++) {
-				Boolean existeCitacao = driver.findElement(By.xpath("//tr[" + h + "]/td[2]/div/span[1]")).getText()
-						.toUpperCase().contains("CITAÇÃO");
-				if (existeCitacao) {
-					driver.findElement(By.xpath("//tr[" + h + "]/td[2]/div/span")).click();
-					String citacaoProcesso = driver
-							.findElement(By.xpath(
-									"//tr[" + h + "]/td[2]/div/span"))
-							.getText();
-					// System.out.println("texto: " + citacaoProcesso);
-					String[] dataCitacao = citacaoProcesso.split("-");
-					System.out.println("texto: " + Arrays.toString(dataCitacao));
-					String[] anoCitacao = dataCitacao[3].split(" ");
-					System.out.println("citacao: " + dataCitacao[1] + "/" + dataCitacao[2] + "/" + anoCitacao[0]);
-					informacao.setCitacao(dataCitacao[1] + "/" + dataCitacao[2] + "/" + anoCitacao[0]);
-					h = listaMovimentacao.size();
-				}
-			}
-		} catch (Exception e) {
-			System.out.println("Erro: true; " + e);
-		}
+
 		for (int i = listaMovimentacao.size(); i > 2; i--) {
 
 			// Providência Jurídica é o título da movimentação
@@ -375,6 +391,7 @@ public class SeleniumRepositorio {
 					String rmi;
 					String dibInicial;
 					String dibFinal;
+					String dibAnterior;
 					String aps;
 					String nbUnido;
 					for (int j = 2; j < 100; j++) {
@@ -395,7 +412,8 @@ public class SeleniumRepositorio {
 								j = 100;
 							}
 						} catch (Exception e) {
-							System.out.println("Entrei no Catch");
+							System.out.println("Entrei no Catch procurarDosPrev");
+							System.out.println(e);
 							break;
 
 						}
@@ -443,11 +461,20 @@ public class SeleniumRepositorio {
 															+ "]/table[2]/tbody/tr[2]/td[1]"))
 											.getText();
 									System.out.println("RMI: " + rmi);
+
+									dibAnterior = driver.findElement(By.xpath("/html/body/div/div[" + z + "]/div[" + j
+											+ "]/table[2]/tbody/tr[2]/td[6]")).getText();
+									if(dibAnterior.contains("-")){
+										dibAnterior = "";
+									}
+
 									aps = driver
 											.findElement(By.xpath(
 													"/html/body/div/div[" + z + "]/div[" + j
 															+ "]/table[3]/tbody/tr[2]/td[8]"))
 											.getText();
+
+
 									System.out.println("APS: " + aps);
 									z = 100;
 									j = 100;
@@ -456,11 +483,12 @@ public class SeleniumRepositorio {
 									informacao.setDibInicial(dibInicial);
 									informacao.setDibFinal(dibFinal);
 									informacao.setDip(dip);
+									informacao.setDibAnterior(dibAnterior);
 									informacao.setUrlProcesso(driver.getCurrentUrl());
 									System.out.println("Url da pagina " + driver.getCurrentUrl());
 									nbUnido = unirNbInformacoesCessado(procurarCessado());
 									informacao.setCessado(nbUnido);
-
+									procurarCitacao(informacao, listaMovimentacao);
 									return informacao;
 								}
 							} catch (Exception e) {
@@ -483,13 +511,42 @@ public class SeleniumRepositorio {
 					// dataAjuizamento =
 					// driver.findElement(By.xpath("/html/body/div/div[5]/table/tbody/tr[3]/td[2]")).getText();
 				}
-
+				procurarCitacao(informacao, listaMovimentacao);
 				return informacao;
 			}
 		}
 
+
+
 		return null;
 
+	}
+
+	private void procurarCitacao(InfomacoesDosPrev informacao, List<WebElement> listaMovimentacao) {
+		try {
+
+			for (int h = 2; h < listaMovimentacao.size(); h++) {
+				driver.switchTo().defaultContent();
+				Boolean existeCitacao = driver.findElement(By.xpath("//tr[" + h + "]/td[2]/div/span[1]")).getText()
+						.toUpperCase().contains("CITAÇÃO");
+				if (existeCitacao) {
+					driver.findElement(By.xpath("//tr[" + h + "]/td[2]/div/span")).click();
+					String citacaoProcesso = driver
+							.findElement(By.xpath(
+									"//tr[" + h + "]/td[2]/div/span"))
+							.getText();
+					// System.out.println("texto: " + citacaoProcesso);
+					String[] dataCitacao = citacaoProcesso.split("-");
+					System.out.println("texto: " + Arrays.toString(dataCitacao));
+					String[] anoCitacao = dataCitacao[3].split(" ");
+					System.out.println("citacao: " + dataCitacao[1] + "/" + dataCitacao[2] + "/" + anoCitacao[0]);
+					informacao.setCitacao(dataCitacao[1] + "/" + dataCitacao[2] + "/" + anoCitacao[0]);
+					h = listaMovimentacao.size();
+				}
+			}
+		} catch (Exception e) {
+			System.out.println("Erro: true; " + e);
+		}
 	}
 
 	public List<InformacoesCessado> procurarCessado() {
@@ -645,6 +702,7 @@ public class SeleniumRepositorio {
 		salvarEtiqueta.click();
 
 		driver.switchTo().window(janela.get(1)).close();
+		driver.switchTo().window(janela.get(2)).close();
 		driver.switchTo().window(janela.get(0));
 		WebElement filtroSpace = driver.findElement(
 				By.xpath("/html/body/div[4]/div[1]/div[2]/div/div[2]/div/div[2]/div/div/a[5]/span/span/span[2]"));
@@ -655,7 +713,7 @@ public class SeleniumRepositorio {
 		this.driver.manage().timeouts().implicitlyWait(100, TimeUnit.MILLISECONDS).pageLoadTimeout(100,
 				TimeUnit.MILLISECONDS);
 		List<String> janela = new ArrayList<String>(driver.getWindowHandles());
-		driver.switchTo().window(janela.get(1));
+		driver.switchTo().window(janela.get(2));
 		Ativo ativo = new Ativo();
 		String beneficio = null;
 		boolean verificarAtivo = false;
@@ -755,7 +813,7 @@ public class SeleniumRepositorio {
 		}
 		driver.findElement(By.id("urlProcesso")).sendKeys(lista.getUrlProcesso());
 		driver.findElement(By.id("aps")).sendKeys(lista.getAps());
-
+		driver.findElement(By.id("dibAnterior")).sendKeys(lista.getDibAnterior());
 		String[] listaNb = lista.getCessado().split(",");
 
 		try {

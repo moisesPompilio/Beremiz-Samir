@@ -7,6 +7,7 @@ package com.samirAtivacao.controller;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import com.samirAtivacao.DAO.DAOInformacoesCessado;
 import com.samirAtivacao.DAO.DAOInformacoesDosPrev;
@@ -52,7 +53,7 @@ public class GeralController {
 			boolean validacao;
 		    ativo.setAtivo(false);
 			try {
-				while("Sem registros para exibir" != repository.entrarNoProcessoAutomatico(usuario.getEtiqueta())) {
+				while(repository.entrarNoProcessoAutomatico(usuario.getEtiqueta())) {
 					validacao = repository.dataDeValidacaoDosPrev();
 					if ( validacao == true) {
 						ativo = repository.verificacaoDeAtivo();
@@ -98,42 +99,43 @@ public class GeralController {
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
-    	Ativo ativo = new Ativo();
-    	ativo.setAtivo(false);
+
 		int x = 0;
-		boolean validacao;
 		String letra = "";
 		daoInfo.excluirUInfomacoesDosPrev();
 		daoInfoCessado.excluirUInfomacoesDosPrev();
+
 		try {
-			while("Sem registros para exibir" != repository.entrarNoProcessoAutomatico(usuario.getEtiqueta())) {
-				validacao = repository.dataDeValidacaoDosPrev();
-				if ( validacao == true) {
+			while(repository.entrarNoProcessoAutomatico(usuario.getEtiqueta())) {
+				Ativo ativo = new Ativo();
+				ativo.setAtivo(false);
+				try {
+					repository.clicarNaPrincipal();
+				}catch  (Exception e) {
+					System.out.println("entrei no cath clicarNaPrincipal");
+				}
+				boolean validacao = repository.dataDeValidacaoDosPrev();
+				if (validacao) {
 					ativo = repository.verificacaoDeAtivo();
 					if(ativo.getAtivo() == true) {
-						if(x <= 10) {
 							info = repository.procurarDosPrev();
 							daoInfo.salvarInformacoesDosPrev(info);
-							repository.etiquetar(validacao, letra, 0);
+							repository.etiquetar(true, letra, 0);
 							x++;
-						}
-						else {
-							break;
-						}
-						
 					}
 					else {
 						repository.etiquetar(ativo.getAtivo(), ativo.getBeneficio(), 1);
 					}
 				}
 				else {
-					repository.etiquetar(ativo.getAtivo(), ativo.getBeneficio(), 0);
-					
+					repository.etiquetar(false, ativo.getBeneficio(), 0);
+
 				}
 			}
-			
+
 		} catch (Exception e) {
-			System.out.println("entrei no cath");
+			System.out.println("entrei no cath controller");
+			System.out.println(e);
 		}
 
 		 return "deu certo";

@@ -24,7 +24,7 @@ public class InfomacoesDosPrev {
 	private String aps;
 	private String dip;
 	private String citacao;
-
+	private String dibAnterior;
 	private  String cessado;
 	
 	private String urlProcesso;
@@ -120,6 +120,14 @@ public class InfomacoesDosPrev {
 
 	public String getCessado() {
 		return cessado;
+	}
+
+	public String getDibAnterior() {
+		return dibAnterior;
+	}
+
+	public void setDibAnterior(String dibAnterior) {
+		this.dibAnterior = dibAnterior;
 	}
 
 	public void setCessado(String cessado) {

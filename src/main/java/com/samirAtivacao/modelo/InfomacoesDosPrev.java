@@ -26,7 +26,16 @@ public class InfomacoesDosPrev {
 	private String citacao;
 	private String dibAnterior;
 	private  String cessado;
-	
+	private String tipo;
+
+	public String getTipo() {
+		return tipo;
+	}
+
+	public void setTipo(String tipo) {
+		this.tipo = tipo;
+	}
+
 	private String urlProcesso;
 	
 	public String getBeneficio() {

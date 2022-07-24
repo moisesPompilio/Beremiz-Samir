@@ -62,6 +62,7 @@ public class BancoController {
 					info.setCessado(rs.getString("nbUnido"));
 					info.setUrlProcesso(rs.getString("urlProcesso"));
 					info.setDibAnterior(rs.getString("dibAnterior"));
+					info.setTipo(rs.getString("tipo"));
 	            	lista.add(info);
 	            	
 	            }

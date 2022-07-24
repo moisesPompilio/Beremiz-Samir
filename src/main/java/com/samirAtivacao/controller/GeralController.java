@@ -5,13 +5,11 @@
 package com.samirAtivacao.controller;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import com.samirAtivacao.DAO.DAOInformacoesCessado;
 import com.samirAtivacao.DAO.DAOInformacoesDosPrev;
-import com.samirAtivacao.modelo.Ativo;
+import com.samirAtivacao.modelo.ProcessoValido;
 import com.samirAtivacao.modelo.InfomacoesDosPrev;
 import com.samirAtivacao.modelo.InformacoesCessado;
 import com.samirAtivacao.modelo.Usuario;
@@ -47,7 +45,7 @@ public class GeralController {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			Ativo ativo = new Ativo();
+			ProcessoValido ativo = new ProcessoValido();
 			int x = 0;
 			int y = 0;
 			boolean validacao;
@@ -107,7 +105,8 @@ public class GeralController {
 
 		try {
 			while(repository.entrarNoProcessoAutomatico(usuario.getEtiqueta())) {
-				Ativo ativo = new Ativo();
+				ProcessoValido ativo = new ProcessoValido();
+				ProcessoValido cessado = new ProcessoValido();
 				ativo.setAtivo(false);
 				try {
 					repository.clicarNaPrincipal();
@@ -116,12 +115,16 @@ public class GeralController {
 				}
 				boolean validacao = repository.dataDeValidacaoDosPrev();
 				if (validacao) {
-					ativo = repository.verificacaoDeAtivo();
-					if(ativo.getAtivo() == true) {
-							info = repository.procurarDosPrev();
+					if(repository.verificacaoDeAtivo().getAtivo() == true) {
+							info = repository.procurarDosPrevAtivo();
 							daoInfo.salvarInformacoesDosPrev(info);
 							repository.etiquetar(true, letra, 0);
 							x++;
+					} else if(repository.verificacaoDeCessado().getAtivo() == true) {
+						info = repository.procurarDosPrevCessado();
+						daoInfo.salvarInformacoesDosPrev(info);
+						repository.etiquetar(true, letra, 0);
+						x++;
 					}
 					else {
 						repository.etiquetar(ativo.getAtivo(), ativo.getBeneficio(), 1);
